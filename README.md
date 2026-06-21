@@ -1,4 +1,4 @@
-# LLM学习
+# 目录主页：LLM学习
 
 更新时间：2026-06-20
 
@@ -34,6 +34,17 @@ node .\tools\build-learning-html.mjs
 - `answers/`：问答答案版，适合模拟面试、复述和查漏补缺。
 - `templates/`：答案卡片、项目复盘、面经复盘和每日计划模板。
 - 根目录专题文件：系统设计、多模态、安全、端侧、数据工程、评测、训练系统、推理引擎、GPU/CUDA、开源生态、Prompt、Tokenizer、长上下文、数据合成等高频方向。
+
+## 主题入口
+
+- 基础路线：学习路线、每日学习法、资源优先级、长期完善目标。
+- 核心模型：Transformer、Attention、RoPE、KV Cache、Tokenizer、解码策略、长上下文。
+- 训练对齐：SFT、LoRA、QLoRA、DPO、GRPO、HuggingFace 微调工程、推理模型后训练。
+- RAG 与 Agent：检索增强、Embedding/Reranker、Tool Calling、MCP、Agent 工程化。
+- 推理部署：vLLM/SGLang/TensorRT-LLM、量化、推测解码、分布式推理、GPU/CUDA/Triton。
+- 项目与面试：项目复盘、简历话术、系统设计、模拟面试、面经追踪、公司 JD 关键词。
+- 多模态与安全：VLM、OCR/Grounding、Diffusion/DiT、语音模型、端侧小模型、安全评测与红队。
+- 数据与评测：数据工程、实验设计、数据合成、ML/DL/NLP 公共基础、损失函数与指标。
 
 ## GitHub 发布内容
 
