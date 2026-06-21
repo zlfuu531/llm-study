@@ -398,18 +398,32 @@ const html = `<!doctype html>
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .toolbar button {
+    .floating-top {
+      position: fixed;
+      right: 18px;
+      bottom: 24px;
+      z-index: 8;
       border: 1px solid var(--line);
       border-radius: 7px;
       background: var(--paper);
       color: var(--ink);
-      min-height: 36px;
-      padding: 7px 11px;
+      min-height: 40px;
+      padding: 8px 13px;
       cursor: pointer;
       white-space: nowrap;
+      box-shadow: 0 12px 28px rgba(36, 40, 34, 0.14);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: opacity 160ms ease, transform 160ms ease, border-color 160ms ease, color 160ms ease;
     }
-    .toolbar button:hover,
-    .toolbar button:focus-visible {
+    body.show-back-to-top .floating-top {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .floating-top:hover,
+    .floating-top:focus-visible {
       border-color: var(--accent);
       color: var(--accent);
       outline: none;
@@ -545,6 +559,51 @@ const html = `<!doctype html>
       margin: 34px 0;
     }
     mark { background: var(--mark); padding: 1px 2px; border-radius: 3px; }
+    .doc-pager {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 10px;
+      margin-top: 48px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+    .pager-button {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 42px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1.25;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .pager-button:hover,
+    .pager-button:focus-visible {
+      border-color: var(--accent);
+      color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(37,111,83,0.12);
+    }
+    .pager-button[disabled] {
+      cursor: not-allowed;
+      color: #a0a79e;
+      background: #f1f2ee;
+      box-shadow: none;
+    }
+    .pager-button.catalog {
+      min-width: 86px;
+      color: #123f2d;
+      font-weight: 700;
+      background: var(--accent-soft);
+      border-color: #c9d9cd;
+    }
+    .pager-button.prev { text-align: left; }
+    .pager-button.next { text-align: right; }
     .rightbar {
       display: none;
       position: fixed;
@@ -614,6 +673,7 @@ const html = `<!doctype html>
     @media (min-width: 1480px) {
       .main { margin-right: var(--rightbar); }
       .rightbar { display: block; }
+      .floating-top { right: calc(var(--rightbar) + 24px); }
     }
     @media (max-width: 760px) {
       .mobile-menu {
@@ -665,6 +725,19 @@ const html = `<!doctype html>
       }
       article h1 { font-size: 27px; }
       article h2 { margin-top: 36px; }
+      .doc-pager {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .pager-button,
+      .pager-button.prev,
+      .pager-button.next {
+        text-align: center;
+      }
+      .floating-top {
+        right: 14px;
+        bottom: 14px;
+      }
       table { min-width: 620px; }
     }
   </style>
@@ -690,7 +763,6 @@ const html = `<!doctype html>
     <main class="main">
       <div class="toolbar">
         <span id="breadcrumb">准备加载</span>
-        <button id="topButton" type="button">回到顶部</button>
       </div>
       <article id="content"></article>
     </main>
@@ -699,6 +771,7 @@ const html = `<!doctype html>
       <nav id="toc" class="toc"></nav>
       <div id="stats" class="stats"></div>
     </aside>
+    <button id="topButton" class="floating-top" type="button" aria-label="回到页面顶部">↑ 顶部</button>
   </div>
   <script id="docs-data" type="application/json">${JSON.stringify(docs).replace(/</g, '\\u003c')}</script>
   <script>
@@ -972,6 +1045,20 @@ const html = `<!doctype html>
       });
     }
 
+    function renderDocPager(path) {
+      const index = docs.findIndex((item) => item.path === path);
+      const prev = index > 0 ? docs[index - 1] : null;
+      const next = index >= 0 && index < docs.length - 1 ? docs[index + 1] : null;
+      const catalogPath = docs[0]?.path || path;
+      const prevText = prev ? '上一页：' + prev.title : '上一页';
+      const nextText = next ? '下一页：' + next.title : '下一页';
+      return '<nav class="doc-pager" aria-label="文档翻页">' +
+        '<button class="pager-button prev" type="button" data-pager="prev" ' + (prev ? 'data-path="' + escapeAttr(prev.path) + '"' : 'disabled') + '>' + escapeHtml(prevText) + '</button>' +
+        '<button class="pager-button catalog" type="button" data-pager="catalog" data-path="' + escapeAttr(catalogPath) + '">目录</button>' +
+        '<button class="pager-button next" type="button" data-pager="next" ' + (next ? 'data-path="' + escapeAttr(next.path) + '"' : 'disabled') + '>' + escapeHtml(nextText) + '</button>' +
+        '</nav>';
+    }
+
     function setSidebarOpen(open) {
       document.body.classList.toggle('sidebar-open', open);
       toggleSidebar?.setAttribute('aria-expanded', String(open));
@@ -982,11 +1069,15 @@ const html = `<!doctype html>
       if (active) active.scrollIntoView({ block: 'nearest' });
     }
 
+    function updateBackToTop() {
+      document.body.classList.toggle('show-back-to-top', window.scrollY > 360);
+    }
+
     function openDoc(path, push = true) {
       const doc = docByPath.get(path) || docs[0];
       if (!doc) return;
       currentPath = doc.path;
-      content.innerHTML = renderMarkdown(doc.markdown, doc.path);
+      content.innerHTML = renderMarkdown(doc.markdown, doc.path) + renderDocPager(doc.path);
       breadcrumb.textContent = doc.group + ' / ' + doc.title;
       stats.innerHTML = '<strong>' + escapeHtml(doc.title) + '</strong><br>' + escapeHtml(doc.path) + '<br>' + doc.markdown.length.toLocaleString('zh-CN') + ' 字符';
       document.title = doc.title + ' - LLM学习';
@@ -995,7 +1086,8 @@ const html = `<!doctype html>
       addCopyButtons();
       requestAnimationFrame(revealActiveDoc);
       if (push) history.replaceState(null, '', '#doc=' + encodeURIComponent(doc.path));
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      updateBackToTop();
       setSidebarOpen(false);
     }
 
@@ -1006,6 +1098,12 @@ const html = `<!doctype html>
     });
 
     content.addEventListener('click', (event) => {
+      const pagerButton = event.target.closest('button[data-pager]');
+      if (pagerButton) {
+        const path = pagerButton.dataset.path;
+        if (path && docByPath.has(path)) openDoc(path);
+        return;
+      }
       const link = event.target.closest('a[data-doc]');
       if (!link) return;
       event.preventDefault();
@@ -1045,6 +1143,7 @@ const html = `<!doctype html>
       tocScrollScheduled = true;
       requestAnimationFrame(() => {
         tocScrollScheduled = false;
+        updateBackToTop();
         updateActiveTocFromScroll();
       });
     }, { passive: true });
