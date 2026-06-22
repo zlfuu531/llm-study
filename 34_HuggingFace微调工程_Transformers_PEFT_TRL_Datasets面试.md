@@ -325,6 +325,17 @@ target_modules 怎么选：
 - Attention + MLP：效果可能更好，训练参数更多。
 - 全 linear：适合不确定结构时，但更吃显存。
 
+LoRA+ 怎么理解：
+
+- `LoraConfig` 里的 `r`、`lora_alpha`、`target_modules` 仍然按普通 LoRA 配。
+- LoRA+ 主要改 optimizer parameter groups：给 LoRA A/B 两组参数设置不同学习率。
+- 常见记忆是 `loraplus_lr_ratio = lr_B / lr_A`，通常取 `>= 1`，并和 base learning rate 一起调。
+- 它不改变推理结构，训练完仍然可以按普通 LoRA adapter 保存、加载或 merge。
+
+面试回答：
+
+> LoRA+ 不是 QLoRA，也不是一种新的 adapter 形状。它是在 LoRA 基础上改训练动态，用不同学习率更新 A/B 矩阵；如果用 Trainer，需要自定义 optimizer 或使用支持 LoRA+ 的 Trainer 封装。
+
 ## 9. QLoRA / bitsandbytes
 
 QLoRA 常见目标：
@@ -563,3 +574,5 @@ Hugging Face 微调工程要按“数据 -> 模板 -> token -> loss -> 训练 ->
 - TRL DPOTrainer 文档：[https://huggingface.co/docs/trl/dpo_trainer](https://huggingface.co/docs/trl/dpo_trainer)
 - TRL ORPOTrainer 文档：[https://huggingface.co/docs/trl/orpo_trainer](https://huggingface.co/docs/trl/orpo_trainer)
 - Transformers bitsandbytes quantization 文档：[https://huggingface.co/docs/transformers/quantization/bitsandbytes](https://huggingface.co/docs/transformers/quantization/bitsandbytes)
+- LoRA+ 论文：[https://proceedings.mlr.press/v235/hayou24a.html](https://proceedings.mlr.press/v235/hayou24a.html)
+- LoRA+ 代码：[https://github.com/nikhil-ghosh-berkeley/loraplus](https://github.com/nikhil-ghosh-berkeley/loraplus)

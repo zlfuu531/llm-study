@@ -6,6 +6,7 @@
 
 - LoRA 为什么低秩就够？
 - LoRA 的 A/B 矩阵 shape 是什么？
+- LoRA+ 为什么要给 A/B 不同学习率？
 - QLoRA 到底量化了什么？
 - DPO 为什么不用 Reward Model？
 - DPO 里的 reference model 有什么用？
@@ -128,7 +129,41 @@ alpha：
 
 > rank 决定 LoRA 分支有多大表达能力，alpha 决定这个分支对原模型输出的影响强度。实际选择要看任务复杂度、数据量和验证集效果。
 
-## 7. QLoRA 到底省在哪里
+## 7. LoRA+：A/B 为什么要不同学习率
+
+LoRA+ 的核心不是换结构，而是换优化器参数组。
+
+普通 LoRA：
+
+```text
+lr_A = lr_B
+```
+
+LoRA+：
+
+```text
+lr_A = base_lr
+lr_B = ratio * base_lr
+ratio = lr_B / lr_A
+```
+
+直觉：
+
+- A、B 的角色不同，梯度动态也不同。
+- 原始 LoRA 用同一个学习率，在大宽度模型上可能让特征学习不充分。
+- LoRA+ 通过 `ratio` 让 B 矩阵通常学得更快，同时保持 LoRA 的推理结构不变。
+
+面试表达：
+
+> LoRA+ 是 LoRA 的 optimizer 改进，不是新的 adapter 结构。训练时给 A、B 两组参数不同学习率，常见是 `lr_B > lr_A`；推理时仍然是普通 LoRA 分支，可以 merge。
+
+调参注意：
+
+- `ratio` 不是越大越好，要和 base learning rate 一起调。
+- 任务越难、越需要学习新特征时，可以尝试更大的 ratio。
+- 如果 loss 抖动、格式退化或过拟合，先降低 base lr 或 ratio。
+
+## 8. QLoRA 到底省在哪里
 
 QLoRA 的关键：
 
@@ -146,7 +181,7 @@ QLoRA 的关键：
 
 > QLoRA 是在量化的冻结基座模型上训练 LoRA 参数。它让大模型微调能在更小显存上进行，但效果仍要通过验证集确认，不能默认无损。
 
-## 8. 对齐到底在对齐什么
+## 9. 对齐到底在对齐什么
 
 SFT 让模型学会回答，但不保证：
 
@@ -158,7 +193,7 @@ SFT 让模型学会回答，但不保证：
 
 偏好对齐就是让模型在多个可能回答之间，更倾向人类认为好的回答。
 
-## 9. RLHF 的逻辑
+## 10. RLHF 的逻辑
 
 RLHF 流程：
 
@@ -174,7 +209,7 @@ RLHF 流程：
 - 标注成本高。
 - 需要控制模型不要偏离太远。
 
-## 10. DPO 的直觉
+## 11. DPO 的直觉
 
 DPO 不显式训练 Reward Model。
 
@@ -200,7 +235,7 @@ loss = -log sigmoid(beta * (pi_logratio - ref_logratio))
 - 如果 policy 比 reference 更能区分 chosen/rejected，loss 小。
 - 如果 policy 没有偏向 chosen，loss 大。
 
-## 11. DPO 为什么需要 reference model
+## 12. DPO 为什么需要 reference model
 
 如果只让 chosen 概率越来越高，模型可能：
 
@@ -217,7 +252,7 @@ reference model 提供锚点：
 
 > DPO 里的 reference model 类似约束基准。它让优化关注 policy 相对 reference 的偏好变化，避免模型为了迎合偏好数据而过度漂移。
 
-## 12. beta 的作用
+## 13. beta 的作用
 
 beta 控制偏好优化强度。
 
@@ -226,7 +261,7 @@ beta 控制偏好优化强度。
 
 可以类比温度或约束强度，但不要说成完全等价。
 
-## 13. ORPO 的直觉
+## 14. ORPO 的直觉
 
 ORPO 也是用 `(prompt, chosen, rejected)`，但它不保留 reference model。它把两件事合在一个目标里：
 
@@ -247,7 +282,7 @@ odds(y|x) = P(y|x) / (1 - P(y|x))
 
 面试里要补一句风险：没有 reference model 不代表没有约束，`lambda`、学习率、数据质量和长度归一化会变得更关键。
 
-## 14. PPO、DPO、ORPO、GRPO 怎么区分
+## 15. PPO、DPO、ORPO、GRPO 怎么区分
 
 PPO：
 
@@ -277,7 +312,7 @@ GRPO：
 - 减少对 value model 的依赖。
 - 常在 DeepSeek-R1 / reasoning model 语境下被问。
 
-## 15. GRPO 的直觉
+## 16. GRPO 的直觉
 
 同一个题目生成多个答案。
 
@@ -298,7 +333,7 @@ answer C: reward 0.6
 
 > GRPO 的核心是 group-relative advantage。对同一个 prompt 采样多个回答，用组内相对奖励来估计哪些回答更值得强化，从而降低传统 PPO 中 value model 的成本和复杂度。
 
-## 16. 微调项目怎么讲才像做过
+## 17. 微调项目怎么讲才像做过
 
 不要说：
 
@@ -308,24 +343,27 @@ answer C: reward 0.6
 
 > 我先判断 prompt/RAG 是否能解决，确认需要行为适配后，把业务数据清洗成 instruction-response 格式，并只对 answer 部分计算 loss。训练上冻结基座模型，用 LoRA 加在 attention 的 q/v projection 上，rank 根据验证集效果选择。评估时除了自动指标，还人工检查幻觉、格式遵循和 bad case。最后如果部署，还要考虑 LoRA merge、量化和回滚。
 
-## 17. 高频追问
+## 18. 高频追问
 
 1. LoRA 为什么用低秩矩阵？
 2. LoRA 的参数量怎么计算？
-3. LoRA 加 Q/V 和加所有 projection 有什么区别？
-4. QLoRA 量化了哪些参数？
-5. SFT 后为什么还要对齐？
-6. RLHF 的 Reward Model 怎么训练？
-7. PPO 为什么需要 KL？
-8. DPO 为什么不需要显式 Reward Model？
-9. DPO 的 reference model 有什么用？
-10. ORPO 和 DPO 有什么区别？
-11. GRPO 为什么适合 reasoning model 讨论？
+3. LoRA+ 为什么要给 A/B 不同学习率？
+4. LoRA+ 和调大 rank、alpha 有什么区别？
+5. LoRA 加 Q/V 和加所有 projection 有什么区别？
+6. QLoRA 量化了哪些参数？
+7. SFT 后为什么还要对齐？
+8. RLHF 的 Reward Model 怎么训练？
+9. PPO 为什么需要 KL？
+10. DPO 为什么不需要显式 Reward Model？
+11. DPO 的 reference model 有什么用？
+12. ORPO 和 DPO 有什么区别？
+13. GRPO 为什么适合 reasoning model 讨论？
 
-## 18. 手撕代码优先级
+## 19. 手撕代码优先级
 
 - LoRA linear layer
 - loss mask
+- LoRA+ optimizer param groups
 - DPO loss
 - ORPO loss
 - preference pair batch 组织
@@ -333,6 +371,7 @@ answer C: reward 0.6
 ## 参考来源
 
 - LoRA: https://arxiv.org/abs/2106.09685
+- LoRA+: https://arxiv.org/abs/2402.12354
 - DPO: https://arxiv.org/abs/2305.18290
 - ORPO: https://arxiv.org/abs/2403.07691
 - DeepSeekMath / GRPO: https://arxiv.org/abs/2402.03300

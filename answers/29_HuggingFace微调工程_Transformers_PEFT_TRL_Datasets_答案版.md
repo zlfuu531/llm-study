@@ -174,6 +174,8 @@ model.print_trainable_parameters()
 
 面试重点是 target_modules。不同模型层名不同，没匹配上会导致几乎没有可训练参数。
 
+LoRA+ 不是 `LoraConfig` 里的结构参数，而是 optimizer 设置：给 LoRA A/B 两组矩阵不同学习率，常见记忆是 `loraplus_lr_ratio = lr_B / lr_A`。它不改变 adapter 保存、加载和 merge 方式。
+
 ## 612. LoRA 的 target_modules 怎么选？
 
 30 秒版：
