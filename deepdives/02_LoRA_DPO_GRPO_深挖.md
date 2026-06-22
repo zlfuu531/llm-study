@@ -1,4 +1,4 @@
-# 深挖 02：LoRA、DPO 与 GRPO
+# 深挖 02：LoRA、DPO、ORPO 与 GRPO
 
 ## 这一章解决什么问题
 
@@ -9,6 +9,7 @@
 - QLoRA 到底量化了什么？
 - DPO 为什么不用 Reward Model？
 - DPO 里的 reference model 有什么用？
+- ORPO 为什么不需要 reference model？
 - GRPO 和 PPO 的差别在哪里？
 
 这章把这些问题讲成一条逻辑线。
@@ -225,7 +226,28 @@ beta 控制偏好优化强度。
 
 可以类比温度或约束强度，但不要说成完全等价。
 
-## 13. PPO、DPO、GRPO 怎么区分
+## 13. ORPO 的直觉
+
+ORPO 也是用 `(prompt, chosen, rejected)`，但它不保留 reference model。它把两件事合在一个目标里：
+
+- SFT：让模型继续学习 chosen answer。
+- Odds ratio preference：让 chosen 的 odds 高于 rejected。
+
+简化公式：
+
+```text
+L_ORPO = L_SFT + lambda * L_OR
+L_OR = -log sigmoid(log odds_chosen - log odds_rejected)
+odds(y|x) = P(y|x) / (1 - P(y|x))
+```
+
+一句话：
+
+> ORPO 是 reference-free 的单阶段偏好优化：chosen 既是监督答案，又在 odds ratio 项里相对 rejected 被拉高。
+
+面试里要补一句风险：没有 reference model 不代表没有约束，`lambda`、学习率、数据质量和长度归一化会变得更关键。
+
+## 14. PPO、DPO、ORPO、GRPO 怎么区分
 
 PPO：
 
@@ -238,7 +260,15 @@ DPO：
 
 - 直接用偏好对。
 - 不显式训练 reward model。
+- 通常需要 reference model。
 - 更像监督式偏好优化。
+
+ORPO：
+
+- 直接用偏好对。
+- 不需要 reward model。
+- 不需要 reference model。
+- 用 SFT + odds ratio 单阶段优化。
 
 GRPO：
 
@@ -247,7 +277,7 @@ GRPO：
 - 减少对 value model 的依赖。
 - 常在 DeepSeek-R1 / reasoning model 语境下被问。
 
-## 14. GRPO 的直觉
+## 15. GRPO 的直觉
 
 同一个题目生成多个答案。
 
@@ -268,7 +298,7 @@ answer C: reward 0.6
 
 > GRPO 的核心是 group-relative advantage。对同一个 prompt 采样多个回答，用组内相对奖励来估计哪些回答更值得强化，从而降低传统 PPO 中 value model 的成本和复杂度。
 
-## 15. 微调项目怎么讲才像做过
+## 16. 微调项目怎么讲才像做过
 
 不要说：
 
@@ -278,7 +308,7 @@ answer C: reward 0.6
 
 > 我先判断 prompt/RAG 是否能解决，确认需要行为适配后，把业务数据清洗成 instruction-response 格式，并只对 answer 部分计算 loss。训练上冻结基座模型，用 LoRA 加在 attention 的 q/v projection 上，rank 根据验证集效果选择。评估时除了自动指标，还人工检查幻觉、格式遵循和 bad case。最后如果部署，还要考虑 LoRA merge、量化和回滚。
 
-## 16. 高频追问
+## 17. 高频追问
 
 1. LoRA 为什么用低秩矩阵？
 2. LoRA 的参数量怎么计算？
@@ -289,21 +319,23 @@ answer C: reward 0.6
 7. PPO 为什么需要 KL？
 8. DPO 为什么不需要显式 Reward Model？
 9. DPO 的 reference model 有什么用？
-10. GRPO 为什么适合 reasoning model 讨论？
+10. ORPO 和 DPO 有什么区别？
+11. GRPO 为什么适合 reasoning model 讨论？
 
-## 17. 手撕代码优先级
+## 18. 手撕代码优先级
 
 - LoRA linear layer
 - loss mask
 - DPO loss
+- ORPO loss
 - preference pair batch 组织
 
 ## 参考来源
 
 - LoRA: https://arxiv.org/abs/2106.09685
 - DPO: https://arxiv.org/abs/2305.18290
+- ORPO: https://arxiv.org/abs/2403.07691
 - DeepSeekMath / GRPO: https://arxiv.org/abs/2402.03300
 - Hugging Face fine-tuning docs: https://huggingface.co/docs/transformers/en/training
 - TorchLeet: https://github.com/Exorust/TorchLeet
 - Datawhale Happy-LLM: https://github.com/datawhalechina/happy-llm
-

@@ -11,7 +11,7 @@
 相邻章节：
 
 - [17_大模型训练系统与分布式训练面试.md](17_大模型训练系统与分布式训练面试.md)：显存、DDP、ZeRO/FSDP、3D 并行、通信。
-- [34_HuggingFace微调工程_Transformers_PEFT_TRL_Datasets面试.md](34_HuggingFace微调工程_Transformers_PEFT_TRL_Datasets面试.md)：Trainer、SFTTrainer、PEFT/LoRA/QLoRA、DPOTrainer 和 adapter 保存合并。
+- [34_HuggingFace微调工程_Transformers_PEFT_TRL_Datasets面试.md](34_HuggingFace微调工程_Transformers_PEFT_TRL_Datasets面试.md)：Trainer、SFTTrainer、PEFT/LoRA/QLoRA、DPOTrainer/ORPOTrainer 和 adapter 保存合并。
 - [25_GPU_CUDA_Triton与FlashAttention面试.md](25_GPU_CUDA_Triton与FlashAttention面试.md)：GPU profiler、kernel、NCCL、torch.compile。
 - [28_ML_DL数学基础_损失函数优化器与指标面试.md](28_ML_DL数学基础_损失函数优化器与指标面试.md)：loss、optimizer、metric、校准和排查。
 - [modules/05_手撕代码_完整学习章.md](modules/05_手撕代码_完整学习章.md)：LLM 相关手写题。

@@ -8,7 +8,7 @@
 
 30 秒版：
 
-完整链路是任务定义、数据 schema、清洗去重脱敏、chat template、tokenize、labels mask、collator、base model/tokenizer、PEFT/量化配置、Trainer/SFTTrainer/DPOTrainer、eval/checkpoint、adapter 保存合并和 bad case 回流。
+完整链路是任务定义、数据 schema、清洗去重脱敏、chat template、tokenize、labels mask、collator、base model/tokenizer、PEFT/量化配置、Trainer/SFTTrainer/DPOTrainer/ORPOTrainer、eval/checkpoint、adapter 保存合并和 bad case 回流。
 
 2 分钟版：
 
@@ -18,7 +18,7 @@
 数据 -> 模板 -> token -> loss -> 训练 -> 保存 -> 评估 -> 回流
 ```
 
-来讲。先确定是 SFT、DPO、分类还是继续预训练；再统一 messages/prompt/response 字段；然后用目标模型的 chat template 渲染文本；tokenize 后构造 labels mask；训练时选择 Trainer、SFTTrainer 或 DPOTrainer；用 LoRA/QLoRA 控显存；最后保存 adapter/tokenizer/model card，并用 bad case 回流更新数据。
+来讲。先确定是 SFT、DPO、ORPO、分类还是继续预训练；再统一 messages/prompt/response 字段；然后用目标模型的 chat template 渲染文本；tokenize 后构造 labels mask；训练时选择 Trainer、SFTTrainer、DPOTrainer 或 ORPOTrainer；用 LoRA/QLoRA 控显存；最后保存 adapter/tokenizer/model card，并用 bad case 回流更新数据。
 
 ## 602. AutoTokenizer、AutoModel、AutoConfig 分别负责什么？
 
@@ -235,11 +235,13 @@ model.config.use_cache = False
 
 推理前再把 `use_cache=True`。
 
-## 615. DPOTrainer 的数据格式和核心逻辑是什么？
+## 615. DPOTrainer / ORPOTrainer 的数据格式和核心逻辑是什么？
 
 30 秒版：
 
 DPOTrainer 通常需要 prompt、chosen、rejected。目标是让模型对 chosen 的相对 logprob 高于 rejected，同时通过 reference model 或隐式约束控制偏离程度。
+
+ORPOTrainer 也通常需要 prompt、chosen、rejected，但它不需要 reference model。核心是把 SFT loss 和 odds-ratio preference loss 合在一起：chosen 用来做监督学习，chosen/rejected 用来做偏好拉开。
 
 2 分钟版：
 
@@ -249,7 +251,7 @@ DPOTrainer 通常需要 prompt、chosen、rejected。目标是让模型对 chose
 {"prompt": "...", "chosen": "好回答", "rejected": "差回答"}
 ```
 
-DPO 适合 SFT 后的偏好优化，比 PPO 简化。常见坑是 chosen/rejected 长度差异、偏好数据噪声、chat template 不一致、beta 不合适和安全退化。评估不能只看偏好胜率，还要看任务正确率、安全和格式。
+DPO 适合 SFT 后的偏好优化，比 PPO 简化。ORPO 适合想把 SFT 和偏好优化放在单阶段里、并减少 reference model 开销的场景。常见坑是 chosen/rejected 长度差异、偏好数据噪声、chat template 不一致、DPO 的 beta 或 ORPO 的 lambda 不合适，以及安全退化。评估不能只看偏好胜率，还要看任务正确率、安全和格式。
 
 ## 616. Adapter 保存、加载、合并怎么做？
 
@@ -352,7 +354,7 @@ output_dir/checkpoint 是否存在
 数据：清洗 JSONL/messages，脱敏去重，统一 chat template，只训练 assistant token。
 训练：用 SFTTrainer/Trainer + PEFT LoRA/QLoRA，设置 max_length、packing、bf16、checkpointing、eval/save steps。
 评估：格式遵循、准确率、安全、人工偏好、bad case。
-难点：模板错、mask 错、截断、target_modules、过拟合、DPO 长度偏置、保存合并。
+难点：模板错、mask 错、截断、target_modules、过拟合、DPO/ORPO 长度偏置、保存合并。
 结果：指标提升、bad case 下降、adapter/model card 可复现交付。
 ```
 

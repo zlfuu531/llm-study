@@ -294,11 +294,11 @@ A_i = (r_i - mean(r_group)) / std(r_group)
 - GRPO：在线多采样，用组内相对 advantage。
 - RLVR：强调 reward 可验证。
 
-## 509. PPO、DPO、GRPO、RLVR 怎么放在同一张图里？
+## 509. PPO、DPO、ORPO、GRPO、RLVR 怎么放在同一张图里？
 
 30 秒版：
 
-PPO、DPO、GRPO 是优化方法或训练算法，RLVR 是用可验证 reward 做 RL 的训练范式。PPO 用 reward 和 value/critic 做在线 RL；DPO 用离线偏好对直接优化；GRPO 用同 prompt 多回答的组内相对 reward；RLVR 里可以用 GRPO 这类算法。
+PPO、DPO、ORPO、GRPO 是优化方法或训练算法，RLVR 是用可验证 reward 做 RL 的训练范式。PPO 用 reward 和 value/critic 做在线 RL；DPO 用离线偏好对直接优化但通常需要 reference model；ORPO 用离线偏好对做 SFT + odds-ratio 单阶段优化且不需要 reference model；GRPO 用同 prompt 多回答的组内相对 reward；RLVR 里可以用 GRPO 这类算法。
 
 2 分钟版：
 

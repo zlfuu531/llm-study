@@ -39,7 +39,7 @@ node .\tools\build-learning-html.mjs
 
 - 基础路线：学习路线、每日学习法、资源优先级、长期完善目标。
 - 核心模型：Transformer、Attention、RoPE、KV Cache、Tokenizer、解码策略、长上下文。
-- 训练对齐：SFT、LoRA、QLoRA、DPO、GRPO、HuggingFace 微调工程、推理模型后训练。
+- 训练对齐：SFT、LoRA、QLoRA、DPO、ORPO、GRPO、HuggingFace 微调工程、推理模型后训练。
 - RAG 与 Agent：检索增强、Embedding/Reranker、Tool Calling、MCP、Agent 工程化。
 - 推理部署：vLLM/SGLang/TensorRT-LLM、量化、推测解码、分布式推理、GPU/CUDA/Triton。
 - 项目与面试：项目复盘、简历话术、系统设计、模拟面试、面经追踪、公司 JD 关键词。

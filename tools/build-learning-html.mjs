@@ -1051,7 +1051,7 @@ const html = `<!doctype html>
       },
       {
         title: '训练、微调与对齐',
-        note: '覆盖 SFT、LoRA、DPO、GRPO、HuggingFace 工程和后训练热点。',
+        note: '覆盖 SFT、LoRA、DPO、ORPO、GRPO、HuggingFace 工程和后训练热点。',
         items: [
           ['modules/02_训练微调对齐_完整学习章.md', '完整章'],
           ['chapters/02_训练微调对齐.md', '专题'],

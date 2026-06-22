@@ -606,7 +606,7 @@ request
 6. Test-time scaling 为什么有效？
 7. 为什么 test-time compute 要按难度动态分配？
 8. GRPO 在 RLVR 里怎么理解？
-9. PPO、DPO、GRPO、RLVR 怎么放在同一张图里？
+9. PPO、DPO、ORPO、GRPO、RLVR 怎么放在同一张图里？
 10. process supervision 和 outcome supervision 怎么选？
 11. reward hacking 怎么发生？
 12. 数学和代码的 reward 怎么设计？
