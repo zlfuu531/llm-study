@@ -120,6 +120,30 @@
       color: var(--quiet);
       font-size: 12px;
     }
+    .nav-start {
+      display: grid;
+      gap: 6px;
+      margin: 0 0 12px;
+      padding: 0 0 12px;
+      border-bottom: 1px solid color-mix(in srgb, var(--line), transparent 28%);
+    }
+    .nav-start-title {
+      margin: 0 8px 2px;
+      color: var(--accent-2);
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .nav-shortcut {
+      border: 1px solid transparent;
+      background: #f3f7ef;
+      color: #123f2d;
+      font-weight: 720;
+    }
+    .nav-shortcut:hover,
+    .nav-shortcut:focus-visible {
+      border-color: #c9d9cd;
+      background: var(--accent-soft);
+    }
     .nav-group {
       margin: 0;
       padding: 7px 0;
@@ -443,36 +467,96 @@
       color: var(--ink);
       font-size: 18px;
     }
-    .home-quick {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin: 24px 0 36px;
+    .home-start {
+      margin: 24px 0 38px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f6f8f0;
     }
-    .home-quick a,
-    .home-card a,
+    .home-start-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 14px;
+    }
+    .home-start-header h2,
+    .home-section h2,
+    .home-source h2 {
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+    .home-start-header h2 {
+      font-size: clamp(22px, 2vw, 28px);
+    }
+    .home-start-header p {
+      max-width: 430px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.52;
+      text-align: right;
+    }
+    .home-start-list {
+      display: grid;
+      gap: 8px;
+      counter-reset: home-step;
+    }
+    .home-track a,
+    .home-library a,
     .home-source a {
       text-decoration: none;
     }
-    .quick-link {
-      display: block;
-      min-height: 92px;
-      padding: 14px;
-      border: 1px solid var(--line);
+    .home-step-link {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      min-height: 46px;
+      padding: 9px 11px;
+      border: 1px solid #dde5d8;
       border-radius: 8px;
-      background: var(--accent-soft);
+      background: var(--paper);
       color: var(--ink);
     }
-    .quick-link strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 16px;
+    .home-step-link::before {
+      counter-increment: home-step;
+      content: counter(home-step);
+      display: inline-grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #123f2d;
+      font-size: 12px;
+      font-weight: 850;
     }
-    .quick-link span {
+    .home-step-main {
+      min-width: 0;
+    }
+    .home-step-title {
       display: block;
-      color: #435047;
-      font-size: 13px;
-      line-height: 1.48;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 14px;
+      font-weight: 760;
+    }
+    .home-step-note {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .home-step-tag,
+    .home-link-tag {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
     }
     .home-section {
       margin: 42px 0 0;
@@ -484,12 +568,7 @@
       gap: 16px;
       margin-bottom: 14px;
     }
-    .home-section h2 {
-      margin: 0;
-      padding: 0;
-      border: 0;
-      font-size: clamp(22px, 2vw, 28px);
-    }
+    .home-section h2 { font-size: clamp(22px, 2vw, 28px); }
     .home-section-note {
       max-width: 420px;
       margin: 0;
@@ -498,36 +577,37 @@
       line-height: 1.5;
       text-align: right;
     }
-    .home-grid {
+    .home-track-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
     }
-    .home-card {
+    .home-track,
+    .home-library-block {
       min-width: 0;
       padding: 16px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--paper);
     }
-    .home-card-top {
+    .home-track-top {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       gap: 10px;
       margin-bottom: 10px;
     }
-    .home-card h3 {
+    .home-track h3 {
       margin: 0;
       font-size: 18px;
       line-height: 1.25;
     }
-    .home-count {
+    .home-track-label {
       flex: 0 0 auto;
       color: var(--muted);
       font-size: 12px;
     }
-    .home-card p {
+    .home-track p {
       margin: 0 0 13px;
       color: #47544a;
       font-size: 13px;
@@ -549,10 +629,10 @@
       background: #fbfcf7;
       color: var(--ink);
     }
+    .home-step-link:hover,
+    .home-step-link:focus-visible,
     .home-link:hover,
-    .home-link:focus-visible,
-    .quick-link:hover,
-    .quick-link:focus-visible {
+    .home-link:focus-visible {
       border-color: var(--accent);
       outline: none;
       box-shadow: 0 0 0 3px rgba(37,111,83,0.12);
@@ -565,10 +645,47 @@
       font-size: 14px;
       font-weight: 650;
     }
-    .home-link-tag {
+    .home-library-list {
+      display: grid;
+      gap: 8px;
+    }
+    .home-library-block {
+      padding: 0;
+      overflow: hidden;
+    }
+    .home-library-block summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 13px 15px;
+      cursor: pointer;
+      list-style: none;
+      color: var(--ink);
+      font-weight: 800;
+    }
+    .home-library-block summary::-webkit-details-marker { display: none; }
+    .home-library-block summary::before {
+      content: ">";
+      display: inline-block;
+      color: var(--quiet);
+      margin-right: 7px;
+      transition: transform 160ms ease-out;
+    }
+    .home-library-block[open] summary::before { transform: rotate(90deg); }
+    .home-library-count {
       color: var(--muted);
       font-size: 12px;
-      white-space: nowrap;
+      font-weight: 650;
+    }
+    .home-library-body {
+      padding: 0 15px 15px;
+    }
+    .home-library-note {
+      margin: -2px 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
     }
     .home-source {
       margin-top: 34px;
@@ -773,10 +890,11 @@
       .home-stats {
         min-width: 0;
       }
-      .home-quick,
-      .home-grid {
+      .home-start-header,
+      .home-track-grid {
         grid-template-columns: 1fr;
       }
+      .home-start-header p { text-align: left; }
       .home-section-header {
         display: block;
       }
@@ -846,15 +964,70 @@
     const focusSearch = document.getElementById('focusSearch');
     const sidebarBackdrop = document.getElementById('sidebarBackdrop');
     const topButton = document.getElementById('topButton');
-    const defaultOpenGroups = new Set(['入口', '路线与题单', '完整学习章']);
+    const defaultOpenGroups = new Set(['入口', '完整学习章']);
     let headingObserver = null;
     let tocHeadings = [];
     let tocScrollScheduled = false;
     let currentPath = docs[0]?.path || '';
-    const homeQuickLinks = [
-      { path: '00_两个月冲刺总路线.md', label: '先定路线', note: '按目标方向决定先学什么、少学什么。' },
-      { path: 'modules/01_Transformer与Attention_完整学习章.md', label: '核心主线', note: '从 Transformer 和 Attention 开始打底。' },
-      { path: '03_高频题单100题.md', label: '开始问答', note: '用高频题单快速发现薄弱点。' }
+    const navShortcuts = [
+      ['README.md', '目录主页'],
+      ['00_两个月冲刺总路线.md', '学习路线'],
+      ['03_高频题单100题.md', '高频题单'],
+      ['06_公式与速查卡.md', '公式速查']
+    ];
+    const homeStartLinks = [
+      { path: '00_两个月冲刺总路线.md', label: '先定路线', tag: '开始', note: '选岗位主线，先决定哪些少看。' },
+      { path: 'modules/01_Transformer与Attention_完整学习章.md', label: '读 Transformer 完整章', tag: '核心', note: 'Attention、RoPE、KV Cache、复杂度先立住。' },
+      { path: 'modules/02_训练微调对齐_完整学习章.md', label: '补训练与微调', tag: '核心', note: 'LoRA、LoRA+、DPO、ORPO、GRPO 放到一条线。' },
+      { path: '03_高频题单100题.md', label: '刷高频题单', tag: '检测', note: '用题单找薄弱点，再跳答案版。' },
+      { path: '06_公式与速查卡.md', label: '最后用速查卡收口', tag: '复盘', note: '面试前快速扫公式、指标和排查链路。' }
+    ];
+    const homeTracks = [
+      {
+        title: '不知道看什么：先走核心路线',
+        label: '最推荐',
+        note: '只看完整章和速查，不先钻扩展专题，适合打开页面不知道点哪的时候。',
+        items: [
+          ['00_两个月冲刺总路线.md', '路线'],
+          ['modules/01_Transformer与Attention_完整学习章.md', 'Transformer'],
+          ['modules/02_训练微调对齐_完整学习章.md', '训练对齐'],
+          ['modules/03_RAG_Agent_MCP_完整学习章.md', 'RAG/Agent'],
+          ['06_公式与速查卡.md', '速查']
+        ]
+      },
+      {
+        title: '大模型算法 / Post-training',
+        label: '算法岗',
+        note: '重点看结构公式、微调对齐、实验评测和训练系统，少被应用细枝末节拖走。',
+        items: [
+          ['modules/02_训练微调对齐_完整学习章.md', '训练对齐'],
+          ['29_ReasoningPostTraining_RLVR_Verifier_TestTimeScaling面试.md', 'Reasoning'],
+          ['28_ML_DL数学基础_损失函数优化器与指标面试.md', 'ML/DL'],
+          ['17_大模型训练系统与分布式训练面试.md', '训练系统']
+        ]
+      },
+      {
+        title: 'AI 应用 / RAG Agent',
+        label: '应用岗',
+        note: '重点看 RAG、Agent、工具调用、评估、安全和项目表达。',
+        items: [
+          ['modules/03_RAG_Agent_MCP_完整学习章.md', 'RAG/Agent'],
+          ['21_Agent工程化_ToolCalling与MCP面试.md', 'Agent 工程'],
+          ['22_Embedding_Reranker与向量检索面试.md', '检索'],
+          ['20_LLMOps模型网关与可观测性面试.md', 'LLMOps']
+        ]
+      },
+      {
+        title: '推理部署 / AI Infra',
+        label: 'Infra',
+        note: '重点看推理引擎、GPU、量化、KV Cache、吞吐延迟和线上排查。',
+        items: [
+          ['modules/04_推理部署与性能优化_完整学习章.md', '推理'],
+          ['24_推理引擎_vLLM_SGLang_TensorRTLLM面试.md', '引擎'],
+          ['25_GPU_CUDA_Triton与FlashAttention面试.md', 'GPU'],
+          ['37_模型量化_低比特推理_GPTQ_AWQ_SmoothQuant面试.md', '量化']
+        ]
+      }
     ];
     const homeSections = [
       {
@@ -1183,7 +1356,13 @@
         docNav.innerHTML = '<div class="nav-meta">0 / ' + docs.length + ' 个文档</div><p class="empty-state">没有匹配内容</p>';
         return;
       }
-      docNav.innerHTML = '<div class="nav-meta">' + filtered.length + ' / ' + docs.length + ' 个文档</div>' + Array.from(groups.entries()).map(([group, groupDocs]) => {
+      const shortcutHtml = q ? '' : '<div class="nav-start"><div class="nav-start-title">先看这些</div>' +
+        navShortcuts.map(([path, label]) => {
+          const doc = docByPath.get(path);
+          if (!doc) return '';
+          return '<button class="doc-link nav-shortcut' + (doc.path === currentPath ? ' active' : '') + '" type="button" data-path="' + escapeAttr(doc.path) + '">' + escapeHtml(label) + '</button>';
+        }).join('') + '</div>';
+      docNav.innerHTML = shortcutHtml + '<div class="nav-meta">' + filtered.length + ' / ' + docs.length + ' 个文档</div>' + Array.from(groups.entries()).map(([group, groupDocs]) => {
         const hasCurrent = groupDocs.some((doc) => doc.path === currentPath);
         const open = q || hasCurrent || defaultOpenGroups.has(group) ? ' open' : '';
         return '<details class="nav-group"' + open + '><summary><span class="nav-group-label">' + escapeHtml(group) + '</span><span class="nav-count">' + groupDocs.length + '</span></summary><ul class="doc-list">' +
@@ -1253,46 +1432,69 @@
         '</a>';
     }
 
-    function renderHomeCard(section) {
-      const links = section.items.map(([path, tag]) => renderHomeDocLink(path, tag)).filter(Boolean);
+    function renderHomeStep(item) {
+      const doc = docByPath.get(item.path);
+      if (!doc) return '';
+      return '<a class="home-step-link" href="#doc=' + encodeURIComponent(doc.path) + '" data-doc="' + escapeAttr(doc.path) + '">' +
+        '<span class="home-step-main"><span class="home-step-title">' + escapeHtml(item.label) + '</span><span class="home-step-note">' + escapeHtml(item.note) + '</span></span>' +
+        '<span class="home-step-tag">' + escapeHtml(item.tag) + '</span>' +
+        '</a>';
+    }
+
+    function renderHomeTrack(track) {
+      const links = track.items.map(([path, tag]) => renderHomeDocLink(path, tag)).filter(Boolean);
       if (!links.length) return '';
-      return '<section class="home-card">' +
-        '<div class="home-card-top"><h3>' + escapeHtml(section.title) + '</h3><span class="home-count">' + links.length + ' 个入口</span></div>' +
-        '<p>' + escapeHtml(section.note) + '</p>' +
+      return '<section class="home-track">' +
+        '<div class="home-track-top"><h3>' + escapeHtml(track.title) + '</h3><span class="home-track-label">' + escapeHtml(track.label) + '</span></div>' +
+        '<p>' + escapeHtml(track.note) + '</p>' +
         '<div class="home-links">' + links.join('') + '</div>' +
         '</section>';
     }
 
+    function renderHomeLibraryBlock(section, index) {
+      const links = section.items.map(([path, tag]) => renderHomeDocLink(path, tag)).filter(Boolean);
+      if (!links.length) return '';
+      const open = index === 0 ? ' open' : '';
+      return '<details class="home-library-block"' + open + '>' +
+        '<summary><span>' + escapeHtml(section.title) + '</span><span class="home-library-count">' + links.length + ' 个入口</span></summary>' +
+        '<div class="home-library-body"><p class="home-library-note">' + escapeHtml(section.note) + '</p><div class="home-links">' + links.join('') + '</div></div>' +
+        '</details>';
+    }
+
     function renderHomePage() {
-      const quick = homeQuickLinks.map((item) => {
-        const doc = docByPath.get(item.path);
-        if (!doc) return '';
-        return '<a class="quick-link" href="#doc=' + encodeURIComponent(doc.path) + '" data-doc="' + escapeAttr(doc.path) + '">' +
-          '<strong>' + escapeHtml(item.label) + '</strong>' +
-          '<span>' + escapeHtml(item.note) + '</span>' +
-          '</a>';
-      }).filter(Boolean).join('');
-      const cards = homeSections.map(renderHomeCard).filter(Boolean).join('');
+      const startLinks = homeStartLinks.map(renderHomeStep).filter(Boolean).join('');
+      const trackCards = homeTracks.map(renderHomeTrack).filter(Boolean).join('');
+      const library = homeSections.map(renderHomeLibraryBlock).filter(Boolean).join('');
       return '<div class="home-page">' +
         '<header class="home-hero">' +
           '<div>' +
-            '<p class="home-kicker">目录页主页</p>' +
+            '<p class="home-kicker">少看一点，先看对的</p>' +
             '<h1 class="home-title">LLM 学习导航</h1>' +
-            '<p class="home-summary">按主题整理核心知识、问答答案、工程实践、项目复盘和学习网站入口。先选方向，再进入对应章节；不需要从文件夹里一点点找。</p>' +
+            '<p class="home-summary">现在资料很多，所以主页只保留最重要的学习路径。先从推荐顺序或岗位主线进入；需要查专题时，再展开下面的专题库。</p>' +
           '</div>' +
           '<div class="home-stats" aria-label="资料概览">' +
             '<div class="home-stat"><span>文档</span><strong>' + docs.length + '</strong></div>' +
-            '<div class="home-stat"><span>主题块</span><strong>' + homeSections.length + '</strong></div>' +
-            '<div class="home-stat"><span>阅读方式</span><strong>单页</strong></div>' +
+            '<div class="home-stat"><span>推荐起点</span><strong>' + homeStartLinks.length + '</strong></div>' +
+            '<div class="home-stat"><span>岗位主线</span><strong>' + homeTracks.length + '</strong></div>' +
           '</div>' +
         '</header>' +
-        '<section class="home-quick" aria-label="快速开始">' + quick + '</section>' +
+        '<section class="home-start" aria-label="推荐阅读顺序">' +
+          '<div class="home-start-header"><h2>先看这 5 个</h2><p>如果你现在不知道点哪里，就按这个顺序走。不要一上来展开全部目录。</p></div>' +
+          '<div class="home-start-list">' + startLinks + '</div>' +
+        '</section>' +
         '<section class="home-section">' +
           '<div class="home-section-header">' +
-            '<h2>按主题选择学习入口</h2>' +
-            '<p class="home-section-note">每个主题块同时放主线章节、专题、深挖和答案版，方便按目标直接跳转。</p>' +
+            '<h2>按岗位选主线</h2>' +
+            '<p class="home-section-note">每条主线只放最关键的入口。学完这些，再去专题库补细节。</p>' +
           '</div>' +
-          '<div class="home-grid">' + cards + '</div>' +
+          '<div class="home-track-grid">' + trackCards + '</div>' +
+        '</section>' +
+        '<section class="home-section home-library">' +
+          '<div class="home-section-header">' +
+            '<h2>专题库</h2>' +
+            '<p class="home-section-note">这里保留全量主题入口，默认折叠，查缺补漏时再展开。</p>' +
+          '</div>' +
+          '<div class="home-library-list">' + library + '</div>' +
         '</section>' +
         '<section class="home-source">' +
           '<h2>资料与维护</h2>' +
